@@ -73,6 +73,10 @@ class Users extends AbstractTable
             ->column('first_name', sortable: true)
             ->column('last_name', sortable: true)
             ->column('email', sortable: true)
+            ->column('created_at', sortable: true)
+            ->rowLink(function(User $user){
+                return route('admin.users.edit', $user);
+            })
             ->paginate(15);
 
 
