@@ -2,7 +2,7 @@
 
 namespace App\Tables;
 
-use App\Models\User;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use ProtoneMedia\Splade\SpladeTable;
@@ -10,7 +10,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use ProtoneMedia\Splade\AbstractTable;
 use Spatie\QueryBuilder\AllowedFilter;
 
-class Users extends AbstractTable
+class Countries extends AbstractTable
 {
     /**
      * Create a new instance.
@@ -37,25 +37,24 @@ class Users extends AbstractTable
      *
      * @return mixed
      */
-    public function for()
+
+   public function for()
     {
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
             $query->where(function ($query) use ($value) {
                 Collection::wrap($value)->each(function ($value) use ($query) {
                     $query
-                        ->orWhere('username', 'LIKE', "%{$value}%")
-                        ->orWhere('first_name', 'LIKE', "%{$value}%")
-                        ->orWhere('last_name', 'LIKE', "%{$value}%")
-                        ->orWhere('email', 'LIKE', "%{$value}%");
+                        ->orWhere('name', 'LIKE', "%{$value}%")
+                        ->orWhere('country_code', 'LIKE', "%{$value}%");
+                        
                 });
             });
         });
 
-        return QueryBuilder::for(User::class)
-            ->defaultSort('username')
-            ->allowedSorts(['username', 'first_name', 'last_name', 'email'])
-            ->allowedFilters(['username', 'first_name', 'last_name', 'email', $globalSearch]);
-    
+        return QueryBuilder::for(Country::class)
+            ->defaultSort('id')
+            ->allowedSorts(['id', 'name', 'country_code'])
+            ->allowedFilters(['id', 'name', 'country_code', $globalSearch]);
     }
 
     /**
@@ -67,19 +66,16 @@ class Users extends AbstractTable
     public function configure(SpladeTable $table)
     {
         $table
-            ->withGlobalSearch(columns: ['id','username', 'first_name', 'last_name', 'email'])
-            
-            ->column('username', sortable: true)
-            ->column('first_name', sortable: true, hidden:true)
-            ->column('last_name', sortable: true, hidden:true)
-            ->column('email', sortable: true)
-            ->column('created_at', sortable: true, hidden:true)
-            ->rowLink(function(User $user){
-                return route('admin.users.edit', $user);
-            })
-            ->column('action')
-            ->paginate(15);
-
+        ->withGlobalSearch(columns: ['id', 'name', 'country_code']) 
+        ->column('name', sortable: true)
+        ->column('country_code', sortable: true)
+        ->column('id', sortable: true)
+        ->column('created_at', sortable: true)
+        ->rowLink(function(Country $country){
+            return route('admin.countries.edit', $country);
+        })
+        ->column('action')
+        ->paginate(15);
 
             // ->searchInput()
             // ->selectFilter()

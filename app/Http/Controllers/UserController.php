@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Tables\Users;
+use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
+use ProtoneMedia\Splade\Facades\Splade;
+use App\Http\Requests\UpdateUserRequest;
+
 class UserController extends Controller
 {
     /**
@@ -21,15 +26,18 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view ('admin.users.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        //
+        User::create($request->validated());
+        Splade::toast('User Created')->autoDismiss(3);
+
+        return to_route('admin.users.index');
     }
 
     /**
@@ -43,24 +51,31 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $user->update($request->validated());
+        Splade::toast('User updated')->autoDismiss(3);
+        
+        return to_route('admin.users.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        Splade::toast('User Deleted')->autoDismiss(3);
+        
+        return back();
     }
 }
