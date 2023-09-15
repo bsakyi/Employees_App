@@ -2,8 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
+use App\Models\State;
 use App\Tables\Cities;
 use Illuminate\Http\Request;
+use ProtoneMedia\Splade\SpladeForm;
+use ProtoneMedia\Splade\Facades\Splade;
+use App\Http\Requests\CreateCityRequest;
+use ProtoneMedia\Splade\FormBuilder\Input;
+use ProtoneMedia\Splade\FormBuilder\Select;
+use ProtoneMedia\Splade\FormBuilder\Submit;
 
 class CityController extends Controller
 {
@@ -22,15 +30,31 @@ class CityController extends Controller
      */
     public function create()
     {
-        //
+        $form =SpladeForm::make()
+        ->action(route('admin.cities.store'))
+        ->fields([
+            Input::make('name')->label('Name'),
+            Select::make('state_id')
+            ->label('Choose a state')
+            ->options(State::pluck('name', 'id')->toArray()),
+            Submit::make()->label('Save')
+        ])->class('space-y-4 bg-white rounded p-4');
+
+        return view('admin.cities.create', [
+            'form' => $form 
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateCityRequest $request, )
     {
-        //
+        City::create($request->validated());
+
+        Splade::toast('City Created')->autoDismiss(5);
+        
+        return to_route('admin.cities.index');
     }
 
     /**
@@ -44,24 +68,47 @@ class CityController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(City  $city)
     {
-        //
+        $form =SpladeForm::make()
+        ->action(route('admin.cities.update', $city))
+        ->method('PATCH')
+        ->fields([
+            Input::make('name')->label('Name'),
+            Select::make('state_id')
+            ->label('Choose a state')
+            ->options(State::pluck('name', 'id')->toArray()),
+            Submit::make()->label('Save')
+            
+        ])->fill($city)
+        ->class('space-y-4 bg-white rounded p-4');
+
+        return view('admin.cities.edit', [
+            'form' => $form 
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CreateCityRequest $request, City $city)
     {
-        //
+        $city->update($request->validated());
+
+        Splade::toast('City Updated')->autoDismiss(5);
+        
+        return to_route('admin.cities.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(City $city)
     {
-        //
+        $city->delete();
+
+        Splade::toast('City Dleted')->autoDismiss(5);
+        
+        return back();
     }
 }

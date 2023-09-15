@@ -2,8 +2,7 @@
 
 namespace App\Tables;
 
-use App\Models\City;
-use App\Models\State;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use ProtoneMedia\Splade\SpladeTable;
@@ -11,7 +10,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use ProtoneMedia\Splade\AbstractTable;
 use Spatie\QueryBuilder\AllowedFilter;
 
-class Cities extends AbstractTable
+class Departments extends AbstractTable
 {
     /**
      * Create a new instance.
@@ -30,6 +29,16 @@ class Cities extends AbstractTable
      */
     public function authorize(Request $request)
     {
+        return true;
+    }
+
+    /**
+     * The resource or query builder.
+     *
+     * @return mixed
+     */
+    public function for()
+    {
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
             $query->where(function ($query) use ($value) {
                 Collection::wrap($value)->each(function ($value) use ($query) {
@@ -41,20 +50,10 @@ class Cities extends AbstractTable
             });
         });
 
-        return QueryBuilder::for(City::class)
+        return QueryBuilder::for(Department::class)
             ->defaultSort('id')
             ->allowedSorts(['id', 'name'])
-            ->allowedFilters(['id', 'name', 'state_id', $globalSearch]);
-    }
-
-    /**
-     * The resource or query builder.
-     *
-     * @return mixed
-     */
-    public function for()
-    {
-        return City::query();
+            ->allowedFilters(['id', 'name', $globalSearch]);
     }
 
     /**
@@ -69,18 +68,12 @@ class Cities extends AbstractTable
         ->withGlobalSearch(columns: ['name']) 
         ->column('id', sortable: true)
         ->column('name', sortable: true)
-        ->column(key: 'state.name', label: 'State')
-        ->column('action')
-        ->selectFilter(
-            key: 'state_id',
-            options: State::pluck('name', 'id')-> toArray(),
-            label: 'State',
-        )
+        ->column('action')     
         ->paginate(15);
 
             // ->searchInput()
             // ->selectFilter()
-            // ->withGlob alSearch()
+            // ->withGlobalSearch()
 
             // ->bulkAction()
             // ->export()
