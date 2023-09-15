@@ -10,7 +10,7 @@
         @cell('action', $state)
             <div class="space-x-2">
                 <Link href="{{ route('admin.states.edit', $state) }}" class="text-white px-3 py-2 bg-green-400 hover:bg-blue-700 rounded-md">Edit</Link>
-                <Link href="{{ route('admin.states.destroy', $state) }}" method="DELETE" confirm="Delete the state"
+                <Link href="{{ route('admin.states.destroy', $state) }}" method="DELETE" confirm="Delete the State"
                 confirm-text="Are you sure?" confirm-buttton="Yes" cancel-button="No"
                 class="text-red-100 px-3 py-2 bg-red-400 hover:bg-red-700 rounded-md">Delete</Link>
             </div>

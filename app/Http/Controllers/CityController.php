@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Tables\Cities;
 use Illuminate\Http\Request;
 
 class CityController extends Controller
@@ -11,7 +12,9 @@ class CityController extends Controller
      */
     public function index()
     {
-        //
+        return view('admin.cities.index', [
+            'cities'=> Cities::class
+        ]);
     }
 
     /**

@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Tables;
+
+use App\Models\City;
+use App\Models\State;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use ProtoneMedia\Splade\SpladeTable;
+use Spatie\QueryBuilder\QueryBuilder;
+use ProtoneMedia\Splade\AbstractTable;
+use Spatie\QueryBuilder\AllowedFilter;
+
+class Cities extends AbstractTable
+{
+    /**
+     * Create a new instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Determine if the user is authorized to perform bulk actions and exports.
+     *
+     * @return bool
+     */
+    public function authorize(Request $request)
+    {
+        $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
+            $query->where(function ($query) use ($value) {
+                Collection::wrap($value)->each(function ($value) use ($query) {
+                    $query
+                        ->orWhere('name', 'LIKE', "%{$value}%");
+                        
+                        
+                });
+            });
+        });
+
+        return QueryBuilder::for(City::class)
+            ->defaultSort('id')
+            ->allowedSorts(['id', 'name'])
+            ->allowedFilters(['id', 'name', 'state_id', $globalSearch]);
+    }
+
+    /**
+     * The resource or query builder.
+     *
+     * @return mixed
+     */
+    public function for()
+    {
+        return City::query();
+    }
+
+    /**
+     * Configure the given SpladeTable.
+     *
+     * @param \ProtoneMedia\Splade\SpladeTable $table
+     * @return void
+     */
+    public function configure(SpladeTable $table)
+    {
+        $table
+        ->withGlobalSearch(columns: ['name']) 
+        ->column('id', sortable: true)
+        ->column('name', sortable: true)
+        ->column(key: 'state.name', label: 'State')
+        ->column('action')
+        ->selectFilter(
+            key: 'country_id',
+            options: State::pluck('name', 'id')-> toArray(),
+            label: 'State',
+        )
+        ->paginate(15);
+
+            // ->searchInput()
+            // ->selectFilter()
+            // ->withGlobalSearch()
+
+            // ->bulkAction()
+            // ->export()
+    }
+}
