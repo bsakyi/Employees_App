@@ -48,7 +48,7 @@ class CityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreateCityRequest $request, )
+    public function store(CreateCityRequest $request )
     {
         City::create($request->validated());
 
@@ -107,7 +107,7 @@ class CityController extends Controller
     {
         $city->delete();
 
-        Splade::toast('City Dleted')->autoDismiss(5);
+        Splade::toast('City Deleted')->autoDismiss(5);
         
         return back();
     }

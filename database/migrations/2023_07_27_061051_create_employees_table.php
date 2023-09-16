@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('country_id')->constrained();
             $table->foreignId('state_id')->constrained();
             $table->foreignId('city_id')->constrained();
-            $table->char('zip code', 10);
+            $table->char('zip_code', 10);
             $table->date('birth_date')->nullable();
              $table->date('date_hired')->nullable();
             $table->timestamps();

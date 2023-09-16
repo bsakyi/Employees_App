@@ -6,8 +6,10 @@ use App\Models\Department;
 use App\Tables\Departments;
 use Illuminate\Http\Request;
 use ProtoneMedia\Splade\SpladeForm;
+use ProtoneMedia\Splade\Facades\Splade;
 use ProtoneMedia\Splade\FormBuilder\Input;
 use ProtoneMedia\Splade\FormBuilder\Submit;
+use App\Http\Requests\CreateDepartmentRequest;
 
 class DepartmentController extends Controller
 {
@@ -41,9 +43,13 @@ class DepartmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateDepartmentRequest $request)
     {
-        //
+        Department::create($request->validated());
+
+        Splade::toast('Department Created')->autoDismiss(5);
+        
+        return to_route('admin.departments.index');
     }
 
     /**
@@ -57,24 +63,43 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Department $department)
     {
-        //
+        $form =SpladeForm::make()
+        ->action(route('admin.departments.update', $department))
+        ->METHOD('PATCH')
+        ->fields([
+            Input::make('name')->label('Name'),
+            Submit::make()->label('Update')
+        ])->fill($department)
+        ->class('space-y-4 bg-white rounded p-4');
+
+        return view('admin.departments.edit', [
+            'form' => $form 
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CreateDepartmentRequest $request, Department $department)
     {
-        //
+        $department->update($request->validated());
+
+        Splade::toast('Department Updated')->autoDismiss(5);
+        
+        return to_route('admin.departments.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Department $department)
     {
-        //
+        $department->delete();
+
+        Splade::toast('Department Deleted')->autoDismiss(5);
+        
+        return back();
     }
 }
